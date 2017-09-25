@@ -1,15 +1,19 @@
 defmodule WebsocketHandler do
   @behaviour :cowboy_websocket_handler
 
+  def random_id do
+    name = Poison.decode!(Namegen.gen)
+    "#{name["first"]} #{name["last"]}"
+  end
+
   def init(_, _req, _opts) do
     {:upgrade, :protocol, :cowboy_websocket}
   end
 
   def websocket_init(_type, req, _opts) do
-    name = Poison.decode!(Namegen.gen)
     main = self
     spawn fn -> 
-      Submarine.subscribe(main, "#{name["first"]} #{name["last"]}", fn msg ->
+      Submarine.subscribe(main, random_id(), fn msg ->
         send main, msg
       end)
     end
@@ -20,8 +24,13 @@ defmodule WebsocketHandler do
   end
 
   def websocket_handle({:text, msg}, req, state) do
-    Submarine.publish(self, msg)
-    {:reply, {:text, "reply"}, req, state}
+    decoded = Poison.decode!(msg)
+    case decoded["action"] do
+      "publish"  -> Submarine.publish(self, decoded["msg"])
+      "identify" -> Submarine.identify(self, decoded["msg"])
+    end
+
+    {:reply, {:text, "{}"}, req, state}
   end
 
   def websocket_info({id, msg}, req, state) do

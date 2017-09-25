@@ -1,18 +1,12 @@
 <html>
 <head>
-  <script>
-    var socket = new WebSocket("ws://localhost:8080/websocket", "gameserver");
-
-    function send() {
-      socket.send("hello");
-    }
-
-    socket.onmessage = function(e) {
-      console.log(e.data);
-    }
-  </script>
+  <title>Elixir Chat Server</title>
+  <script src="script.js"></script>
+  <link rel="stylesheet" type="text/css" href="style.css" />
 </head>
 <body>
-  <button onclick="send()">Send</button>
+  <div id="console">
+    <div id="msgs"></div>
+    <input id="msg_input" type="text" />
 </body>
 </html>
