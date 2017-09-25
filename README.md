@@ -1,3 +1,3 @@
 # ElixirGameServer
 
-<p>a websocket server in elixir and cowboy</p>
+<p>a websocket chat server in elixir</p>
